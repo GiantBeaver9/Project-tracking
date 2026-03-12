@@ -1,0 +1,47 @@
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "YourStr0ngP@ssword!"
+      MSSQL_PID: "Developer"
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  api:
+    build:
+      context: ../backend
+      dockerfile: ../docker/Dockerfile.api
+    ports:
+      - "8000:8000"
+    environment:
+      PT_DB_HOST: db
+      PT_DB_PORT: "1433"
+      PT_DB_NAME: project_tracker
+      PT_DB_USER: sa
+      PT_DB_PASSWORD: "YourStr0ngP@ssword!"
+      PT_SECRET_KEY: "dev-secret-change-in-production"
+      PT_REDIS_URL: "redis://redis:6379/0"
+      PT_CORS_ORIGINS: '["http://localhost:5173"]'
+    depends_on:
+      - db
+      - redis
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: ../docker/Dockerfile.frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api
+
+volumes:
+  mssql_data:
