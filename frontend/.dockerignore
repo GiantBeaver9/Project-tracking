@@ -1,0 +1,6 @@
+.git
+node_modules
+dist
+.svelte-kit
+build
+.env

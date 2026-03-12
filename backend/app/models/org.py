@@ -1,10 +1,9 @@
-import uuid
+from datetime import datetime
 
-from sqlalchemy import Boolean, ForeignKey, Integer, String, Text, UniqueConstraint
-from sqlalchemy.dialects.mssql import UNIQUEIDENTIFIER
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.models.base import Base, TimestampMixin, new_guid
+from app.models.base import Base, TimestampMixin, new_guid, utcnow
 
 
 class OrgNode(Base, TimestampMixin):
@@ -48,7 +47,9 @@ class OrgNodeType(Base):
     allowed_depth_min: Mapped[int | None] = mapped_column(Integer, nullable=True)
     allowed_depth_max: Mapped[int | None] = mapped_column(Integer, nullable=True)
     is_system: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
-    created_at: Mapped[str] = mapped_column(String(50), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utcnow, nullable=True
+    )
 
 
 class OrgNodeClosure(Base):

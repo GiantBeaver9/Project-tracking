@@ -57,7 +57,7 @@
         </tr>
       </thead>
       <tbody>
-        {#each projects as project}
+        {#each projects as project (project.project_id)}
           <tr>
             <td><RAGBadge health={project.health_status} /></td>
             <td class="code">{project.code}</td>

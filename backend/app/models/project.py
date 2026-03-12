@@ -100,8 +100,12 @@ class ProjectAssignment(Base):
     assigned_date: Mapped[date] = mapped_column(Date, nullable=False)
     removed_date: Mapped[date | None] = mapped_column(Date, nullable=True)
 
+    # Relationships
+    project = relationship("Project")
+    user = relationship("User")
 
-class Task(Base):
+
+class Task(Base, TimestampMixin):
     __tablename__ = "tasks"
 
     task_id: Mapped[int] = mapped_column(
@@ -131,7 +135,7 @@ class Task(Base):
     assignee = relationship("User", foreign_keys=[assigned_to])
 
 
-class Milestone(Base):
+class Milestone(Base, TimestampMixin):
     __tablename__ = "milestones"
 
     milestone_id: Mapped[int] = mapped_column(

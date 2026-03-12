@@ -1,10 +1,11 @@
 <script>
   import '../app.css';
+  import { browser } from '$app/environment';
   import { isAuthenticated, logout } from '$lib/api/client.js';
   import NotificationBell from '$lib/components/NotificationBell.svelte';
 
   let { children } = $props();
-  const authed = $derived(typeof window !== 'undefined' && isAuthenticated());
+  const authed = $derived(browser && isAuthenticated());
 </script>
 
 {#if authed}

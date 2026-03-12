@@ -78,26 +78,6 @@ async def create_project(
     return project
 
 
-@router.get("", response_model=list[ProjectResponse])
-async def list_projects(
-    status_filter: str | None = Query(None, alias="status"),
-    page: int = Query(1, ge=1),
-    page_size: int = Query(50, ge=1, le=200),
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
-):
-    query = select(Project)
-
-    if status_filter:
-        query = query.where(Project.status == status_filter)
-
-    query = query.order_by(Project.name)
-    query = query.offset((page - 1) * page_size).limit(page_size)
-
-    result = await db.execute(query)
-    return result.scalars().all()
-
-
 @router.get("/active", response_model=list[ProjectResponse])
 async def list_active_projects(
     db: AsyncSession = Depends(get_db),
@@ -155,6 +135,26 @@ async def list_active_projects(
 
     combined = node_project_query.union(direct_project_query).order_by(Project.name)
     result = await db.execute(combined)
+    return result.scalars().all()
+
+
+@router.get("", response_model=list[ProjectResponse])
+async def list_projects(
+    status_filter: str | None = Query(None, alias="status"),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(50, ge=1, le=200),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    query = select(Project)
+
+    if status_filter:
+        query = query.where(Project.status == status_filter)
+
+    query = query.order_by(Project.name)
+    query = query.offset((page - 1) * page_size).limit(page_size)
+
+    result = await db.execute(query)
     return result.scalars().all()
 
 

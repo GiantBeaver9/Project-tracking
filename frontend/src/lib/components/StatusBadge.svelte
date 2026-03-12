@@ -1,5 +1,5 @@
 <script>
-  let { status = '', variant = 'default' } = $props();
+  let { status = '' } = $props();
 
   const colorMap = {
     ACTIVE: 'badge-green',

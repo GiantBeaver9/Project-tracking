@@ -1,8 +1,16 @@
+import { goto } from '$app/navigation';
+import { browser } from '$app/environment';
+
 const API_BASE = '/api/v1';
+
+function getToken() {
+  if (!browser) return null;
+  return localStorage.getItem('access_token');
+}
 
 function getHeaders() {
   const headers = { 'Content-Type': 'application/json' };
-  const token = localStorage.getItem('access_token');
+  const token = getToken();
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
@@ -11,9 +19,11 @@ function getHeaders() {
 
 async function handleResponse(response) {
   if (response.status === 401) {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    window.location.href = '/login';
+    if (browser) {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      goto('/login');
+    }
     throw new Error('Unauthorized');
   }
 
@@ -61,17 +71,22 @@ export async function login(username, password) {
   }
 
   const data = await response.json();
-  localStorage.setItem('access_token', data.access_token);
-  localStorage.setItem('refresh_token', data.refresh_token);
+  if (browser) {
+    localStorage.setItem('access_token', data.access_token);
+    localStorage.setItem('refresh_token', data.refresh_token);
+  }
   return data;
 }
 
 export function logout() {
-  localStorage.removeItem('access_token');
-  localStorage.removeItem('refresh_token');
-  window.location.href = '/login';
+  if (browser) {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+  }
+  goto('/login');
 }
 
 export function isAuthenticated() {
+  if (!browser) return false;
   return !!localStorage.getItem('access_token');
 }

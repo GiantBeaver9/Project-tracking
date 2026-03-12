@@ -10,10 +10,12 @@
 
   onMount(async () => {
     try {
-      [user, projects] = await Promise.all([
+      const results = await Promise.all([
         apiGet('/auth/me'),
         apiGet('/projects?status=ACTIVE'),
       ]);
+      user = results[0];
+      projects = results[1];
     } catch (err) {
       console.error('Failed to load dashboard data', err);
     } finally {
@@ -50,7 +52,7 @@
     {#if projects.length > 0}
       <h2>Active Projects</h2>
       <div class="project-list">
-        {#each projects as project}
+        {#each projects as project (project.project_id)}
           <div class="project-row">
             <RAGBadge health={project.health_status} />
             <a href="/projects/{project.project_id}">{project.name}</a>
